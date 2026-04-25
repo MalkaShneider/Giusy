@@ -5,6 +5,10 @@ class CandidateRepository {
     return await Candidate.create(data);
   }
 
+  async findById(id) {
+    return await Candidate.findById(id).lean();
+  }
+
   async getCandidateByIdWithAnaysis(id) {
     return await Candidate.findById(id).populate('analysis');
   }

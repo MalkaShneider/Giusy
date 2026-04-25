@@ -22,11 +22,10 @@ export default function useInterview({ candidateInfo, onConversationEnd, reset }
   }
 
 async function handleSubmit(finalAnswers) {
-  // 1. חילוץ ה-ID של המועמד
+  // 1. חילוץ ה-ID של המועמד - נבדוק את כל האפשרויות
   const candidateId = 
     candidateInfo?._id ||    
-    candidateInfo?.id ||     
-    candidateInfo?.data?._id;
+    candidateInfo?.id;
 
   if (!candidateId) {
     setSubmitError('לא נמצא מזהה מועמד. אנא נסה להירשם מחדש.');
@@ -34,27 +33,32 @@ async function handleSubmit(finalAnswers) {
   }
 
   setSubmitting(true);
+  setSubmitError('');
+  
   try {
-    // --- התיקון הקריטי כאן ---
     // הופכים את מערך האובייקטים למערך של מחרוזות (Strings) בלבד
-    // זה מה שה-Backend וה-Schema של מונגו מצפים לקבל
-    const plainAnswersForServer = finalAnswers.map(item => item.answer);
+    const plainAnswersForServer = finalAnswers.map(item => 
+      typeof item === 'string' ? item : item.answer
+    );
 
-    console.log("📤 שולח תשובה מנוקה לשרת:", plainAnswersForServer);
-
-    // שליחה לשרת עם המערך המנוקה
+    // שליחה לשרת
     const result = await submitInterviewAnalysis(candidateId, plainAnswersForServer);
     
-    // אם הגענו לכאן, השרת החזיר 201 והכל נשמר
+    // הצלחה - מציג הודעה
     pushBot(DONE_MESSAGE);
     
-    // מעביר את התוצאה לדף ה-Completion
-    onConversationEnd?.({ ...candidateInfo, _id: candidateId, analysis: result });
+    // מסמנים שהראיון הסתיים
     setDone(true);
+    
+    // מעביר את התוצאה לדף ה-Completion עם כל הנתונים
+    onConversationEnd?.({ 
+      ...candidateInfo, 
+      _id: candidateId, 
+      id: candidateId,
+      analysis: result 
+    });
 
   } catch (error) {
-    console.error("🔥 שגיאה בשמירת הראיון:", error);
-    // מציג הודעה למשתמש
     setSubmitError(error.message || 'לא הצלחנו לשמור את תשובות הראיון.');
   } finally {
     setSubmitting(false);
@@ -63,7 +67,7 @@ async function handleSubmit(finalAnswers) {
 
   function submitAnswer(text) {
     const trimmed = text.trim();
-    if (!trimmed || done) return;
+    if (!trimmed || done || submitting) return;
 
     const activeQuestion = interviewQuestions[currentIndex];
     const newAnswers = [
@@ -83,12 +87,12 @@ async function handleSubmit(finalAnswers) {
       return;
     }
 
-    setDone(true);
+    // סיום הראיון - שולחים לשרת
     handleSubmit(newAnswers);
   }
 
   function handleSend() {
-    if (!input.trim() || done) return;
+    if (!input.trim() || done || submitting) return;
     submitAnswer(input);
   }
 
