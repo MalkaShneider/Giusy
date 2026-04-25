@@ -53,7 +53,12 @@ function deriveParameters(scores = {}) {
 }
 
 // Supports flat Conversation model, flat Candidate model, or legacy nested formats.
+// תומך גם ב-populated analysis מ-MongoDB
 function extractAnalysisRecord(source = {}) {
+  // אם analysis הוא אובייקט מלא (populated), נשתמש בו
+  if (source.analysis && typeof source.analysis === 'object' && source.analysis._id) {
+    return source.analysis;
+  }
   return source.analysis || source.conversation || source.interview || source;
 }
 

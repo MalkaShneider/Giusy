@@ -104,6 +104,9 @@ export default function ChatInterview({ onConversationEnd, candidateInfo }) {
         <div ref={bottomRef} />
       </div>
 
+      {submitting ? (
+        <div style={styles.submittingBar}>שומר את הראיון... אנא המתן</div>
+      ) : null}
       {!supported ? (
         <div style={styles.warning}>זיהוי דיבור אינו נתמך בדפדפן זה. מומלץ Chrome או Edge.</div>
       ) : null}
@@ -280,6 +283,14 @@ const styles = {
     lineHeight: 1.6,
     fontWeight: 500,
     boxShadow: '0 2px 8px rgba(255,55,92,0.2)',
+  },
+  submittingBar: {
+    background: 'linear-gradient(135deg, #1e285a, #2d3a6e)',
+    color: '#fff',
+    padding: '0.75rem 1rem',
+    fontSize: '0.9rem',
+    textAlign: 'center',
+    fontWeight: 600,
   },
   warning: {
     background: '#fef3c7',

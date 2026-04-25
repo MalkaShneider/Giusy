@@ -33,10 +33,12 @@ export async function createCandidate(payload) {
     body: JSON.stringify(payload),
   });
   
-  // במקום לסמוך על ה-Normalize המורכב, נחזיר את האובייקט כמו שהוא + ID שטוח
+  // מוודא שיש גם _id וגם id לתאימות מלאה
+  const candidateId = data._id || data.id;
   return {
     ...data,
-    id: data._id || data.id // מבטיח שיהיה שדה id פשוט
+    _id: candidateId,
+    id: candidateId
   };
 }
 
@@ -54,10 +56,10 @@ export async function submitInterviewAnalysis(candidateId, answers) {
 }
 
 /**
- * שליפת כל המועמדים (עבור דף הניהול/Admin)
+ * שליפת כל המועמדים עם הניתוח (עבור דף הניהול/Admin)
  */
 export async function fetchCandidates() {
-  const data = await request('/api/candidates');
+  const data = await request('/api/candidates/WithSomeAnaysis');
   const list = Array.isArray(data) ? data : data?.candidates || [];
   return normalizeCandidates(list);
 }
