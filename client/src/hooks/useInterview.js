@@ -106,6 +106,6 @@ async function handleSubmit(finalAnswers) {
     submitting,
     submitError,
     handleSend,
-    handleSubmit,
+    submitAnswer,
   };
 }

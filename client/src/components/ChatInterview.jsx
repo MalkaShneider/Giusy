@@ -20,7 +20,6 @@ export default function ChatInterview({ onConversationEnd, candidateInfo }) {
 
   const {
     messages,
-    answers,
     input,
     setInput,
     currentIndex,
@@ -28,7 +27,6 @@ export default function ChatInterview({ onConversationEnd, candidateInfo }) {
     submitting,
     submitError,
     handleSend,
-    handleSubmit,
   } = useInterview({ candidateInfo, onConversationEnd, reset });
 
   useEffect(() => {
